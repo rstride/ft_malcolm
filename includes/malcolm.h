@@ -1,40 +1,92 @@
-#ifndef ARP_H
-#define ARP_H
+#ifndef FT_MALCOLM_H
+# define FT_MALCOLM_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <net/if.h>
-#include <netinet/if_ether.h>
-#include <netinet/ip.h>
-#include <netinet/ether.h>
-#include <sys/ioctl.h>
-#include <linux/if_packet.h>
-#include <net/ethernet.h>
-#include <netinet/if_ether.h>
-#include <sys/ioctl.h>
+# include <arpa/inet.h>
+# include <ifaddrs.h>
+# include <linux/if_ether.h>
+# include <linux/if_packet.h>
+# include <netinet/in.h>
+# include <net/if_arp.h>
+# include <net/if.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <sys/socket.h>
+# include <unistd.h>
 
-#define ARP_REQUEST 1
-#define ARP_REPLY 2
+# define PRG_NAME "ft_malcolm"
+# define MAC_LENGTH 6
+# define IPV4_LENGTH 4
 
-struct arp_hdr {
-    unsigned short htype;
-    unsigned short ptype;
-    unsigned char hlen;
-    unsigned char plen;
-    unsigned short opcode;
-    unsigned char sender_mac[6];
-    unsigned char sender_ip[4];
-    unsigned char target_mac[6];
-    unsigned char target_ip[4];
-};
+# define PADDING 18
 
-void handle_error(const char *msg);
-void create_arp_reply(char *src_ip, char *src_mac, char *target_ip, char *target_mac);
+# define NB_OPTIONS 2
 
+# define ERR_NB_DEST		1
+# define ERR_INV_OPT		2
+# define ERR_INV_ARG		3
+# define ERR_OOR_ARG		4 /* OUT OF RANGE */
+# define ERR_REQ_ARG		5
 
+# define print_arp_mac(x) printf("%02x:%02x:%02x:%02x:%02x:%02x\n", x[0], x[1], x[2], x[3], x[4], x[5])
+# define print_arp_ip(x) printf("%d.%d.%d.%d\n", x[0], x[1], x[2], x[3])
 
-#endif // ARP_H
+typedef struct			s_arp_packet
+{
+	struct arphdr		arp_hdr;
+	unsigned char		sender_mac[MAC_LENGTH];
+	unsigned char		sender_ip[IPV4_LENGTH];
+	unsigned char		target_mac[MAC_LENGTH];
+	unsigned char		target_ip[IPV4_LENGTH];
+}						t_arp_packet;
+
+typedef struct			s_machine
+{
+	char				*ip;
+	char				*mac;
+	in_addr_t			inet_ip;
+	unsigned char		arp_mac[MAC_LENGTH];
+	unsigned char		arp_ip[IPV4_LENGTH];
+}						t_machine;
+
+typedef struct			s_options
+{
+	int					h;
+	int					v;
+}						t_options;
+
+typedef struct			s_malcolm
+{
+	t_machine			source;
+	t_machine			target;
+	struct sockaddr_ll	sockaddr;
+	int					sockfd;
+	int					ifindex;
+	t_options			options;
+	unsigned char		arp_mac[MAC_LENGTH];
+	unsigned char		arp_ip[IPV4_LENGTH];
+}						t_malcolm;
+
+/* network.c */
+int			check_mac_addr(char *mac_addr);
+int			get_interface(t_malcolm *malcolm);
+void		fill_arp_ip(unsigned char dest[IPV4_LENGTH], char *ip);
+void		fill_arp_mac(unsigned char dest[IPV4_LENGTH], char *mac);
+
+/* logs.c */
+void		show_help(void);
+int			args_error(char *prg_name, int error, char *str, int range1, int range2);
+void		print_ethernet_header(struct ethhdr *ethhdr);
+void		print_arp_header(struct arphdr *arp_hdr);
+
+/* args.c */
+int			check_args(int argc, char *argv[], t_malcolm *malcolm);
+
+/* utils.c */
+size_t		ft_strlen(const char *s);
+void		*ft_memset(void *b, int c, size_t len);
+int			ft_memcmp(const void *s1, const void *s2, size_t n);
+void		*ft_memcpy(void *dst, const void *src, size_t n);
+int			hex2int(const char *hex);
+int			ft_atoi(const char *str);
+
+#endif
