@@ -9,21 +9,21 @@ _END		=	\e[0m
 CC_FLAGS	=	-Wall -Wextra -Werror -fno-builtin
 
 # DIRECTORIES #
-DIR_HEADERS		=	./includes/
-DIR_SRCS		=	./srcs/
-DIR_OBJS		=	./compiled_srcs/
+DIR_HEADERS		=	./inc/
+DIR_SRCS		=	./src/
+DIR_OBJS		=	./obj/
 
 # FILES #
-SRCS			=	ft_malcolm.c \
+SRCS			=	main.c \
 					args.c \
 					network.c \
 					logs.c \
 					utils.c
 
-INCLUDES		=	ft_malcolm.h
+INCLUDES		=	malcolm.h
 
 # COMPILED_SOURCES #
-OBJS 		=	$(SRCS:%.c=$(DIR_OBJS)%.o)
+OBJS 		=	$(addprefix $(DIR_OBJS),$(SRCS:.c=.o))
 NAME 		=	ft_malcolm
 
 ifeq ($(BUILD),debug)
@@ -64,5 +64,4 @@ re:				fclean
 				@$(MAKE) --no-print-directory
 
 # PHONY #
-
 .PHONY:			all clean fclean re

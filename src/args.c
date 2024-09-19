@@ -1,4 +1,4 @@
-#include "ft_malcolm.h"
+#include "malcolm.h"
 
 int			handle_options(int argc, char *argv[], int *i, t_malcolm *malcolm)
 {

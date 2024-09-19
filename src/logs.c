@@ -1,4 +1,4 @@
-#include "ft_malcolm.h"
+#include "malcolm.h"
 
 void		show_help(void)
 {

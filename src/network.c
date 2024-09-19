@@ -1,4 +1,4 @@
-#include "ft_malcolm.h"
+#include "malcolm.h"
 
 int			check_mac_addr(char *mac_addr)
 {
